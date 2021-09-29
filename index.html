@@ -15,6 +15,43 @@
                 height: 200px;
                 margin: 0px;
             }
+            #card-output {
+                display: flex;
+                flex-wrap: wrap;
+            }
+            .card {
+                position: relative;
+                border: 1px solid #DDD;
+                text-align: center;
+                margin: 0;
+                width: 2.5in;
+                height: 3.5in;
+                overflow: hidden;
+                margin-right: 10px;
+                margin-bottom: 10px;
+            }
+            .card-hint {
+                position: absolute;
+                top: 6%;
+                left: 10%;
+                margin: 0;
+            }
+            .card-content {
+                position: relative;
+                top: 50%;
+                left: 0;
+                padding: 0 6% 6%;
+                user-select: none;
+                font-size: 15px;
+                color: #000!important;
+            }
+            .card-title {
+                margin-top: 0;
+                font-size: 18px;
+            }
+            .card-description {
+                margin: 0 0 10px;
+            }
         </style>
     </head>
     <body>
@@ -26,21 +63,46 @@
         <div id="card-output"></div>
     </body>
     <script>
-        function parseTSV(data){
-            return data;
-        }
-        function renderCards(tsvData){
+        function updateCards(tsvData){
             var cards = parseTSV(tsvData);
-            outputElem.innerHTML = cards;
+            console.log(cards);
+            renderCards(cards);
+        }
+        function parseTSV(data){
+            // TODO: Add csv support
+            var rows = data.split(/\r?\n/);
+            rows = rows.map(row => row.split('\t'));
+            var headers = rows.shift();
+            return rows.map(row => {
+                return row.reduce((carry, value, index) => {
+                    carry[headers[index]] = value;
+                    return carry;
+                }, {});
+            });
+        }
+        function renderCards(cards){
+            // TODO: Quantity
+            // TODO: Handle card backs
+            outputElem.innerHTML = cards.map(buildCardHTML).join('');
+        }
+        function buildCardHTML(card){
+            return `
+            <div class="card">
+                <h3 class="card-hint">${card.Hint || ''}</h3>
+                <div class="card-content">
+                    <h2 class="card-title">${card.Name || ''}</h2>
+                    <p class="card-description">${card.Description || ''}</p>
+                </div>
+            </div>`;
         }
         var outputElem = document.getElementById('card-output');
         ['keydown', 'change'].forEach(event => {
             document.getElementById('import').addEventListener(event, e => {
-                renderCards(e.target.value);
+                updateCards(e.target.value);
             });
         });
         document.getElementById('import').addEventListener('paste', e => {
-            renderCards((event.clipboardData || window.clipboardData).getData('text'));
+            updateCards((event.clipboardData || window.clipboardData).getData('text'));
         });
     </script>
 </html>

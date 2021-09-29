@@ -36,17 +36,23 @@
                 height: 200px;
                 margin: 0px;
             }
-            #card-output {
-                max-width: 200mm;
-            }
             .card-page {
-
+                width: 8.5in;
+                height: 11in;
+                border: 1px solid;
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                justify-content: flex-start;
+            }
+            .card-page.back-page {
+                justify-content: flex-end;
             }
             .card {
                 display: inline-block; /* cannot use flex because it doesn't work with break-inside for printing */
                 position: relative;
                 text-align: center;
-                margin: 1mm;
+                margin: 2.5mm;
                 border: 1mm solid #DDD;
                 width: 63mm;
                 height: 88mm;
@@ -99,11 +105,9 @@
             var cards = Papa.parse(tsvData, {
                 header: true,
             }).data;
-            console.log(cards);
             renderCards(cards);
         }
         function parseTSV(data){
-            // TODO: Add csv support
             var rows = data.split(/\r?\n/);
             rows = rows.map(row => row.split('\t'));
             var headers = rows.shift();
@@ -116,11 +120,11 @@
         }
         function renderCards(cards){
             cards = expandCardQuantities(cards);
+            console.log(cards);
             outputElem.innerHTML = buildCardPages(cards);
         }
         function buildCardPages(cards){
             let pages = [];
-            console.log(cards);
             const hasBacks = cards.some(card => !!card.Back);
             while(cards.length > 0){
                 const page = [];
@@ -129,17 +133,19 @@
                     const card = cards.length ? cards.shift() : {};
                     page.push(buildCard(card));
                     if(hasBacks){
-                        // TODO: Handle mirroring on backs
-                        // TODO: Center styles
-                        backs.push(buildCard({Name: card.Back, classes: ['card-back']}));
+                        backs[getBackIndex(i)] = buildCard({Name: card.Back, classes: ['card-back']});
                     }
                 }
-                pages.push(page.join(''));
+                pages.push(`<div class="card-page">${page.join('')}</div>`);
                 if(hasBacks){
-                    pages.push(backs.join(''));
+                    pages.push(`<div class="card-page back-page">${backs.join('')}</div>`);
                 }
             }
-            return `<div class="card-page">${pages.join('</div><div class="card-page">')}</div>`;
+            return pages.join('');
+        }
+        function getBackIndex(frontIndex){
+            const indexMap = [2, 1, 0, 5, 4, 3, 8, 7, 6];
+            return indexMap[frontIndex];
         }
         function buildCard(card){
             return `

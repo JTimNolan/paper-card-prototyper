@@ -28,6 +28,9 @@
                 margin: 0;
                 font-family: Verdana, Arial, sans-serif;
             }
+            p, h2 {
+                margin: 0;
+            }
             #import {
                 width: 900px;
                 height: 200px;
@@ -35,6 +38,9 @@
             }
             #card-output {
                 max-width: 200mm;
+            }
+            .card-page {
+
             }
             .card {
                 display: inline-block; /* cannot use flex because it doesn't work with break-inside for printing */
@@ -48,29 +54,34 @@
             }
             .card-hint {
                 position: absolute;
-                top: 6%;
-                left: 10%;
+                top: 5%;
+                left: 7%;
                 margin: 0;
             }
             .card-content {
                 position: relative;
-                padding: 20% 10% 10%;
+                padding: 20% 7% 7%;
                 height: 100%;
                 display: flex;
+                flex-direction: column;
                 justify-content: center;
                 align-items: center;
-                text-align: left;
+                text-align: center;
                 user-select: none;
                 font-size: 15px;
                 color: #000!important;
             }
             .card-title {
-                margin-top: 0;
+                margin-bottom: 10px;
                 font-size: 18px;
             }
             .card-description {
                 white-space: pre-line;
-                line-height: 1.4;
+                text-align: left;
+            }
+            .card-description span {
+                display: block;
+                margin-bottom: .4em;
             }
         </style>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.1/papaparse.min.js" integrity="sha512-EbdJQSugx0nVWrtyK3JdQQ/03mS3Q1UiAhRtErbwl1YL/+e2hZdlIcSURxxh7WXHTzn83sjlh2rysACoJGfb6g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -104,31 +115,51 @@
             });
         }
         function renderCards(cards){
-            // TODO: Handle card backs
-            outputElem.innerHTML = [
-                cards.map(card => buildCardHTML(card)),
-                '<div class="page-break"></div>',
-                cards.map(card => buildCardHTML({Quantity: card.Quantity, Name: card.Back, classes: ['card-back']})),
-            ].flat().join('');
+            cards = expandCardQuantities(cards);
+            outputElem.innerHTML = buildCardPages(cards);
         }
-        function buildCardHTML(card){
-            console.log(card);
-            card.Quantity = card.Quantity || 1;
-            if(card.Quantity == 0){
-                return '';
+        function buildCardPages(cards){
+            let pages = [];
+            console.log(cards);
+            const hasBacks = cards.some(card => !!card.Back);
+            while(cards.length > 0){
+                const page = [];
+                const backs = [];
+                for(var i = 0; i < 9; i++){
+                    const card = cards.length ? cards.shift() : {};
+                    page.push(buildCard(card));
+                    if(hasBacks){
+                        // TODO: Handle mirroring on backs
+                        // TODO: Center styles
+                        backs.push(buildCard({Name: card.Back, classes: ['card-back']}));
+                    }
+                }
+                pages.push(page.join(''));
+                if(hasBacks){
+                    pages.push(backs.join(''));
+                }
             }
-            var carryHTML = '';
-            if(card.Quantity > 1){
-                carryHTML = buildCardHTML({...card, Quantity: card.Quantity-1});
-            }
-            return `${carryHTML}
+            return `<div class="card-page">${pages.join('</div><div class="card-page">')}</div>`;
+        }
+        function buildCard(card){
+            return `
             <div class="card ${(card.classes || []).join(' ')}">
                 <h3 class="card-hint">${card.Hint || ''}</h3>
                 <div class="card-content">
                     <h2 class="card-title">${card.Name || ''}</h2>
-                    <p class="card-description">${card.Description || ''}</p>
+                    <p class="card-description"><span>${(card.Description || '').replace(/(?:\r\n|\r|\n)/g, '</span><span>')}</span></p>
                 </div>
             </div>`;
+        }
+        function expandCardQuantities(cards){
+            return cards.map(card => {
+                const output = [];
+                card.Quantity = card.Quantity || 1;
+                for(var i = 0; i < card.Quantity; i++){
+                    output.push(card);
+                }
+                return output;
+            }).flat();
         }
         var outputElem = document.getElementById('card-output');
         ['keydown', 'change'].forEach(event => {

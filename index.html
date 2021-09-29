@@ -3,32 +3,44 @@
         <title>Quick Paper Prototyper For Cards</title>
         <style>
             @media print {
+                @page {
+                    size: letter;
+                }
                 body > * {
                     display: none;
                 }
                 #card-output {
                     display: block;
                 }
+                .card {
+                    position: relative;
+                    break-inside: avoid;
+                }
+
+            }
+            html {
+                box-sizing: border-box;
+            }
+            *, *:before, *:after {
+                box-sizing: inherit;
+            }
+            body {
+                margin: 0;
             }
             #import {
                 width: 900px;
                 height: 200px;
                 margin: 0px;
             }
-            #card-output {
-                display: flex;
-                flex-wrap: wrap;
-            }
             .card {
+                display: inline-block; /* cannot use flex because it doesn't work with break-inside for printing */
                 position: relative;
-                border: 1px solid #DDD;
                 text-align: center;
-                margin: 0;
-                width: 2.5in;
-                height: 3.5in;
+                margin: 1mm;
+                border: 1mm solid #DDD;
+                width: 63mm;
+                height: 88mm;
                 overflow: hidden;
-                margin-right: 10px;
-                margin-bottom: 10px;
             }
             .card-hint {
                 position: absolute;
@@ -85,7 +97,9 @@
         }
         function renderCards(cards){
             // TODO: Handle card backs
-            outputElem.innerHTML = cards.map(buildCardHTML).join('');
+            outputElem.innerHTML = cards.map((card, index) => {
+                return buildCardHTML(card);
+            }).join('');
         }
         function buildCardHTML(card){
             card.Quantity = card.Quantity || 1;

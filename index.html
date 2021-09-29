@@ -10,6 +10,11 @@
                     display: block;
                 }
             }
+            #import {
+                width: 900px;
+                height: 200px;
+                margin: 0px;
+            }
         </style>
     </head>
     <body>
@@ -21,9 +26,21 @@
         <div id="card-output"></div>
     </body>
     <script>
+        function parseTSV(data){
+            return data;
+        }
+        function renderCards(tsvData){
+            var cards = parseTSV(tsvData);
+            outputElem.innerHTML = cards;
+        }
         var outputElem = document.getElementById('card-output');
-        document.getElementById('import').addEventListener('change', e => {
-            outputElem.innerHTML = e.target.value;
+        ['keydown', 'change'].forEach(event => {
+            document.getElementById('import').addEventListener(event, e => {
+                renderCards(e.target.value);
+            });
+        });
+        document.getElementById('import').addEventListener('paste', e => {
+            renderCards((event.clipboardData || window.clipboardData).getData('text'));
         });
     </script>
 </html>

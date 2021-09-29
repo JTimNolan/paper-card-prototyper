@@ -53,6 +53,7 @@
                 margin: 0 0 10px;
             }
         </style>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.1/papaparse.min.js" integrity="sha512-EbdJQSugx0nVWrtyK3JdQQ/03mS3Q1UiAhRtErbwl1YL/+e2hZdlIcSURxxh7WXHTzn83sjlh2rysACoJGfb6g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     </head>
     <body>
         <h1>Import TSV Data</h1>
@@ -64,7 +65,9 @@
     </body>
     <script>
         function updateCards(tsvData){
-            var cards = parseTSV(tsvData);
+            var cards = Papa.parse(tsvData, {
+                header: true,
+            }).data;
             console.log(cards);
             renderCards(cards);
         }
@@ -81,12 +84,20 @@
             });
         }
         function renderCards(cards){
-            // TODO: Quantity
             // TODO: Handle card backs
             outputElem.innerHTML = cards.map(buildCardHTML).join('');
         }
         function buildCardHTML(card){
-            return `
+            card.Quantity = card.Quantity || 1;
+            if(card.Quantity == 0){
+                return '';
+            }
+            var carryHTML = '';
+            if(card.Quantity > 1){
+                card.Quantity--;
+                carryHTML = buildCardHTML(card);
+            }
+            return `${carryHTML}
             <div class="card">
                 <h3 class="card-hint">${card.Hint || ''}</h3>
                 <div class="card-content">

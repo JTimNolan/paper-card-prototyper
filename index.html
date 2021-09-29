@@ -26,6 +26,7 @@
             }
             body {
                 margin: 0;
+                font-family: Verdana, Arial, sans-serif;
             }
             #import {
                 width: 900px;
@@ -53,9 +54,12 @@
             }
             .card-content {
                 position: relative;
-                top: 50%;
-                left: 0;
-                padding: 0 6% 6%;
+                padding: 20% 10% 10%;
+                height: 100%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                text-align: left;
                 user-select: none;
                 font-size: 15px;
                 color: #000!important;
@@ -65,7 +69,8 @@
                 font-size: 18px;
             }
             .card-description {
-                margin: 0 0 10px;
+                white-space: pre-line;
+                line-height: 1.4;
             }
         </style>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.1/papaparse.min.js" integrity="sha512-EbdJQSugx0nVWrtyK3JdQQ/03mS3Q1UiAhRtErbwl1YL/+e2hZdlIcSURxxh7WXHTzn83sjlh2rysACoJGfb6g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -103,18 +108,18 @@
             outputElem.innerHTML = [
                 cards.map(card => buildCardHTML(card)),
                 '<div class="page-break"></div>',
-                cards.map(card => buildCardHTML({Name: card.Back, classes: ['card-back']})),
+                cards.map(card => buildCardHTML({Quantity: card.Quantity, Name: card.Back, classes: ['card-back']})),
             ].flat().join('');
         }
         function buildCardHTML(card){
+            console.log(card);
             card.Quantity = card.Quantity || 1;
             if(card.Quantity == 0){
                 return '';
             }
             var carryHTML = '';
             if(card.Quantity > 1){
-                card.Quantity--;
-                carryHTML = buildCardHTML(card);
+                carryHTML = buildCardHTML({...card, Quantity: card.Quantity-1});
             }
             return `${carryHTML}
             <div class="card ${(card.classes || []).join(' ')}">

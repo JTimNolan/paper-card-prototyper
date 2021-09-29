@@ -16,7 +16,7 @@
                     position: relative;
                     break-inside: avoid;
                 }
-
+                .page-break { page-break-after: always; }
             }
             html {
                 box-sizing: border-box;
@@ -31,6 +31,9 @@
                 width: 900px;
                 height: 200px;
                 margin: 0px;
+            }
+            #card-output {
+                max-width: 200mm;
             }
             .card {
                 display: inline-block; /* cannot use flex because it doesn't work with break-inside for printing */
@@ -97,9 +100,11 @@
         }
         function renderCards(cards){
             // TODO: Handle card backs
-            outputElem.innerHTML = cards.map((card, index) => {
-                return buildCardHTML(card);
-            }).join('');
+            outputElem.innerHTML = [
+                cards.map(card => buildCardHTML(card)),
+                '<div class="page-break"></div>',
+                cards.map(card => buildCardHTML({Name: card.Back, classes: ['card-back']})),
+            ].flat().join('');
         }
         function buildCardHTML(card){
             card.Quantity = card.Quantity || 1;
@@ -112,7 +117,7 @@
                 carryHTML = buildCardHTML(card);
             }
             return `${carryHTML}
-            <div class="card">
+            <div class="card ${(card.classes || []).join(' ')}">
                 <h3 class="card-hint">${card.Hint || ''}</h3>
                 <div class="card-content">
                     <h2 class="card-title">${card.Name || ''}</h2>

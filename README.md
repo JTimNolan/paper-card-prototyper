@@ -1,3 +1,3 @@
 # paper-card-prototyper
 
-Vew this tool: https://jtimnolan.github.io/paper-card-prototyper/
+Use this tool here: https://jtimnolan.github.io/paper-card-prototyper/

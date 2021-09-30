@@ -2,22 +2,6 @@
     <head>
         <title>Quick Paper Prototyper For Cards</title>
         <style>
-            @media print {
-                @page {
-                    size: letter;
-                }
-                body > * {
-                    display: none;
-                }
-                #card-output {
-                    display: block;
-                }
-                .card {
-                    position: relative;
-                    break-inside: avoid;
-                }
-                .page-break { page-break-after: always; }
-            }
             html {
                 box-sizing: border-box;
             }
@@ -35,6 +19,9 @@
                 width: 900px;
                 height: 200px;
                 margin: 0px;
+            }
+            #card-output {
+                margin-top: 20px;
             }
             .card-page {
                 width: 8.5in;
@@ -89,15 +76,42 @@
                 display: block;
                 margin-bottom: .4em;
             }
+            @media print {
+                @page {
+                    size: letter;
+                }
+                body > * {
+                    display: none;
+                }
+                #card-output {
+                    display: block;
+                    margin-top: 0;
+                }
+                .card {
+                    position: relative;
+                    break-inside: avoid;
+                }
+                .card-page {
+                    border: none;
+                }
+                .page-break { page-break-after: always; }
+            }
         </style>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.1/papaparse.min.js" integrity="sha512-EbdJQSugx0nVWrtyK3JdQQ/03mS3Q1UiAhRtErbwl1YL/+e2hZdlIcSURxxh7WXHTzn83sjlh2rysACoJGfb6g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     </head>
     <body>
-        <h1>Import TSV Data</h1>
+        <h1>Import Data</h1>
         <textarea id="import"></textarea>
+        <h1>About This Tool:</h1>
+        <p>
+            This tool is designed to quickly generate cards from csv/tsv/etc data. Currently it's only tested for printing on letter sized paper. It can also handle printing on the back of the card for printers that support 2-sided printing, but the results tend to be a bit rough (i.e. slightly misaligned) due to most printers lack of accuracy on this front.
+        </p>
         <h1>How to use:</h1>
-        <p>Copy cells from your preferred spreadsheet tool (Google Sheets, Excel, etc.) and paste into the text box.</p>
-        <p>This tool is designed for fast iteration. Don't waste too much time on looks while you prototype your game!</p>
+        <p>
+            Copy cells from your preferred spreadsheet tool (Google Sheets, Excel, etc.) and paste into the text box.<br />
+            The first row will be used as headers to generate your cards. Accepted values are: Name, Hint, Quantity, Description, Back.<br />
+            Using Back will generate card backs for 2-sided printing.<br />
+        </p>
         <div id="card-output"></div>
     </body>
     <script>

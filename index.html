@@ -45,6 +45,9 @@
                 height: 88mm;
                 overflow: hidden;
             }
+            .card-back, .card-page {
+                border-style: dashed;
+            }
             .card-hint {
                 position: absolute;
                 top: 5%;
@@ -65,14 +68,14 @@
                 color: #000!important;
             }
             .card-title {
-                margin-bottom: 10px;
+                margin-bottom: .1em;
                 font-size: 18px;
             }
             .card-description {
                 white-space: pre-line;
                 text-align: left;
             }
-            .card-description span {
+            .card-content span {
                 display: block;
                 margin-bottom: .4em;
             }
@@ -91,7 +94,7 @@
                     position: relative;
                     break-inside: avoid;
                 }
-                .card-page {
+                .card-back, .card-page {
                     border: none;
                 }
                 .page-break { page-break-after: always; }
@@ -164,13 +167,16 @@
             const indexMap = [2, 1, 0, 5, 4, 3, 8, 7, 6];
             return indexMap[frontIndex];
         }
+        function nl2span(text){
+            return '<span>'+text.replace(/(?:\r\n|\r|\n)/g, '</span><span>')+'</span>';
+        }
         function buildCard(card){
             return `
             <div class="card ${(card.classes || []).join(' ')}">
                 <h3 class="card-hint">${card.Hint || ''}</h3>
                 <div class="card-content">
-                    <h2 class="card-title">${card.Name || ''}</h2>
-                    <p class="card-description"><span>${(card.Description || '').replace(/(?:\r\n|\r|\n)/g, '</span><span>')}</span></p>
+                    <h2 class="card-title">${nl2span(card.Name || '')}</h2>
+                    <p class="card-description">${nl2span(card.Description || '')}</p>
                 </div>
             </div>`;
         }

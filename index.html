@@ -146,6 +146,9 @@
             });
         }
         function renderCards(cards){
+            var customStyles = cards.map(x => x.Styles || '').join("");
+            console.log(customStyles);
+            applyCustomStyles(customStyles);
             cards = expandCardQuantities(cards);
             console.log(cards);
             outputElem.innerHTML = buildCardPages(cards);
@@ -158,9 +161,14 @@
                 const backs = [];
                 for(var i = 0; i < 9; i++){
                     const card = cards.length ? cards.shift() : {};
+                    card.classes = [];
+                    if(card.Class && card.Class != ''){
+                        card.classes.push(card.Class);
+                    }
                     page.push(buildCard(card));
                     if(hasBacks){
-                        backs[getBackIndex(i)] = buildCard({Name: card.Back, classes: ['card-back']});
+                        card.classes.push('card-back');
+                        backs[getBackIndex(i)] = buildCard({Name: card.Back, classes: card.classes});
                     }
                 }
                 pages.push(`<div class="card-page">${page.join('')}</div>`);
@@ -197,6 +205,22 @@
                 }
                 return output;
             }).flat();
+        }
+        function applyCustomStyles(customStyleText){
+            const customStyleID = 'custom-styles';
+            let style = document.getElementById(customStyleID);
+            if(style){
+                style.remove();
+            }
+            style = document.createElement('style');
+            style.type = 'text/css';
+            style.id = customStyleID;
+            if(style.styleSheet){
+                style.styleSheet.cssText = customStyleText;
+            }else{
+                style.appendChild(document.createTextNode(customStyleText));
+            }
+            document.getElementsByTagName('head')[0].appendChild(style);
         }
         var outputElem = document.getElementById('card-output');
         ['keydown', 'change'].forEach(event => {

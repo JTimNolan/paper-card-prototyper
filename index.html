@@ -49,9 +49,16 @@
                 border-style: dashed;
             }
             .card-hint {
+                text-align: left;
                 position: absolute;
                 top: 5%;
                 left: 7%;
+                margin: 0;
+            }
+            .card-version {
+                position: absolute;
+                bottom: 3%;
+                right: 5%;
                 margin: 0;
             }
             .card-content {
@@ -178,6 +185,7 @@
                     <h2 class="card-title">${nl2span(card.Name || '')}</h2>
                     <p class="card-description">${nl2span(card.Description || '')}</p>
                 </div>
+                <div class="card-version">${!!card.Version ? 'v'+card.Version : ''}</div>
             </div>`;
         }
         function expandCardQuantities(cards){

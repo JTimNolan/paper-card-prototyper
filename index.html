@@ -147,7 +147,7 @@
         }
         function renderCards(cards){
             var customStyles = cards.map(x => x.Styles || '').join("");
-            console.log(customStyles);
+            // console.log(customStyles);
             applyCustomStyles(customStyles);
             cards = expandCardQuantities(cards);
             console.log(cards);
